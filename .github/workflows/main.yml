@@ -40,7 +40,7 @@ jobs:
       - name: Dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          port install open-mpi suitesparse
+          port install openmpi suitesparse
 
       - name: Configure
         run: |
