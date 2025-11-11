@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CTEST_OUTPUT_ON_FAILURE: ON
+  CTEST_PARALLEL_LEVEL: 2
+
+jobs:
+  ####################
+  # Linux / macOS
+  ####################
+
+  Unix:
+    name: ${{ matrix.name }} (${{ matrix.config }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+        config: [Release]
+        include:
+          - os: macos-14
+            name: macOS
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.6
+        with:
+          fetch-depth: 10
+      - name: Install MacPorts
+        uses: melusina-org/setup-macports@v1
+        id: 'macports'
+      - name: 'Validate installed MacPorts version'
+        run: >-
+          test "$(port version)" = 'Version: 2.11.5'
+      - name: 'Validate transmitted MacPorts prefix'
+        run: >-
+          test "${{ steps.macports.outputs.prefix }}" = '/opt/local'
+      - name: 'Validate transmitted MacPorts version'
+        run: >-
+          test "${{ steps.macports.outputs.version }}" = '2.11.5'
+
+      - name: Dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          port install open-mpi suitesparse
+
+      - name: Configure
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
