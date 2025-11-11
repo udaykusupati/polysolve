@@ -33,15 +33,9 @@ jobs:
       - name: Install MacPorts
         uses: melusina-org/setup-macports@v1
         id: 'macports'
-      - name: 'Validate installed MacPorts version'
-        run: >-
-          test "$(port version)" = 'Version: 2.11.5'
       - name: 'Validate transmitted MacPorts prefix'
         run: >-
           test "${{ steps.macports.outputs.prefix }}" = '/opt/local'
-      - name: 'Validate transmitted MacPorts version'
-        run: >-
-          test "${{ steps.macports.outputs.version }}" = '2.11.5'
 
       - name: Dependencies (macOS)
         if: runner.os == 'macOS'
